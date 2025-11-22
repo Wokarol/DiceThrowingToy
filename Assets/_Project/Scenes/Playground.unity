@@ -1603,13 +1603,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 471865240}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.33402103, y: 0.6232414, z: 0.33402103, w: 0.62324154}
-  m_LocalPosition: {x: -14.37, y: 8.31, z: -0}
+  m_LocalRotation: {x: -0.39885002, y: 0.5838824, z: 0.39885002, w: 0.5838825}
+  m_LocalPosition: {x: -15.15, y: 6.53, z: -0}
   m_LocalScale: {x: 18, y: 16, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1937440432}
-  m_LocalEulerAnglesHint: {x: -56.377, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: -68.674, y: 90, z: 0}
 --- !u!65 &471865242
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2695,7 +2695,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &767176285
 Transform:
   m_ObjectHideFlags: 0
@@ -3654,6 +3654,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6046162561966951591, guid: 248e7f12436618740bc722d726906679, type: 3}
   m_PrefabInstance: {fileID: 1077893629}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1113181525
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1113181526}
+  - component: {fileID: 1113181527}
+  m_Layer: 0
+  m_Name: Dice Spawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1113181526
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1113181525}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.06918069, y: -0.70371217, z: -0.069180205, w: 0.7037169}
+  m_LocalPosition: {x: 22.79, y: 12.93, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: -11.229, y: -90, z: 0}
+--- !u!114 &1113181527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1113181525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07cbf3184de6d2a47841f18798faca25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Wokarol.DiceSpawner
+  dice: {fileID: 5298399400593224775, guid: a8b2f4e130c105f4f841034946a31edf, type: 3}
+  minForce: 15
+  maxForce: 20
+  minTorque: 4
+  maxTorque: 7
+  throwDirectionMaxAngle: 10
+  keepRolledDiceDynamic: 1
 --- !u!1 &1120395192
 GameObject:
   m_ObjectHideFlags: 0
@@ -5954,7 +6005,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1937440431}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0.000002324581}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
@@ -5965,7 +6016,7 @@ Transform:
   - {fileID: 767176285}
   - {fileID: 752286387}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
 --- !u!1001 &1949105817
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6533,3 +6584,4 @@ SceneRoots:
   - {fileID: 1818724954}
   - {fileID: 2005446982}
   - {fileID: 1937440432}
+  - {fileID: 1113181526}
