@@ -3698,13 +3698,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07cbf3184de6d2a47841f18798faca25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Wokarol.DiceSpawner
-  dice: {fileID: 5298399400593224775, guid: a8b2f4e130c105f4f841034946a31edf, type: 3}
+  dice: {fileID: 7438887476697717204, guid: a8b2f4e130c105f4f841034946a31edf, type: 3}
   minForce: 15
   maxForce: 20
   minTorque: 4
   maxTorque: 7
   throwDirectionMaxAngle: 10
   keepRolledDiceDynamic: 1
+  extraDebugData: 0
 --- !u!1 &1120395192
 GameObject:
   m_ObjectHideFlags: 0
