@@ -24,7 +24,7 @@ namespace Wokarol
         [SerializeField] private float throwDirectionMaxAngle = 10;
         [Space]
         [SerializeField] private SimulationEndThreshold simulationEndThreshold = SimulationEndThreshold.DiceSleeping;
-        [SerializeField] private bool keepObjectsDynamicAfterThrow = true;
+        [SerializeField] private bool keepDiceDynamicAfterThrow = true;
         [SerializeField] private List<GameObject> rootObjectsToSearchForDynamicsIn = new();
         [Space]
         [Space]
@@ -249,7 +249,7 @@ namespace Wokarol
             }
 
             // We clean up and revert the things to correct state
-            if (keepObjectsDynamicAfterThrow)
+            if (keepDiceDynamicAfterThrow)
             {
                 for (int i = 0; i < allDynamicObjects.Count; i++)
                 {
@@ -264,8 +264,19 @@ namespace Wokarol
             }
             else
             {
-                allDynamicObjects.Clear();
-                computedAnimation.Clear();
+                for (int i = allDynamicObjects.Count - 1; i >= 0; i--)
+                {
+                    var d = allDynamicObjects[i];
+
+                    if (sceneDynamicObjects.Contains(d))
+                    {
+                        d.isKinematic = false;
+                        continue;
+                    }
+
+                    allDynamicObjects.RemoveAt(i);
+                    computedAnimation.RemoveAt(i);
+                }
             }
 
             isRollingDice = false;
