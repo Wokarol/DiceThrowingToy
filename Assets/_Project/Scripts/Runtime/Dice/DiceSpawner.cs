@@ -120,7 +120,8 @@ namespace Wokarol
 
             Physics.Simulate(Time.fixedDeltaTime);
 
-            for (int step = 0; step < 1000; step++)
+            int maxSteps = (int)(20f / Time.fixedDeltaTime);
+            for (int step = 0; step <= maxSteps; step++)
             {
                 Physics.Simulate(Time.fixedDeltaTime);
 
@@ -147,6 +148,7 @@ namespace Wokarol
 
                     computedAnimation[i].LastLinearVelocity = d.linearVelocity;
                     computedAnimation[i].LastAngularVelocity = d.angularVelocity;
+                    computedAnimation[i].WasSleepingAtTheEnd = d.IsSleeping();
                 }
 
                 if (simulationEndThreshold is SimulationEndThreshold.DiceSleeping)
@@ -161,10 +163,10 @@ namespace Wokarol
 
                 if (isSimulationReadyToStop)
                 {
-                    Debug.Log($"{LogExtras.Prefix(this)} Smulated the roll in {LogExtras.Value(step)} steps");
+                    Debug.Log($"{LogExtras.Prefix(this)} Simulated the roll in {LogExtras.Value(step)} steps");
                     break;
                 }
-                else if (step == 999)
+                else if (step == maxSteps)
                 {
                     Debug.LogWarning($"{LogExtras.Prefix(this)} Reached the simulation step limit");
                 }
@@ -192,9 +194,6 @@ namespace Wokarol
 
                 allDynamicObjects[i].transform.position = frame.Position;
                 allDynamicObjects[i].transform.rotation = frame.Rotation;
-
-                allDynamicObjects[i].position = frame.Position;
-                allDynamicObjects[i].rotation = frame.Rotation;
             }
 
             // The simulation starts again
@@ -222,6 +221,9 @@ namespace Wokarol
                     d.isKinematic = false;
                     allDynamicObjects[i].linearVelocity = computedAnimation[i].LastLinearVelocity;
                     allDynamicObjects[i].angularVelocity = computedAnimation[i].LastAngularVelocity;
+
+                    if (computedAnimation[i].WasSleepingAtTheEnd)
+                        allDynamicObjects[i].Sleep();
                 }
             }
             else
@@ -280,6 +282,7 @@ namespace Wokarol
 
             public Vector3 LastLinearVelocity;
             public Vector3 LastAngularVelocity;
+            public bool WasSleepingAtTheEnd;
         }
 
         enum SimulationEndThreshold

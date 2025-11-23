@@ -2207,6 +2207,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: bottle_A_brown_dynamic (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7685721625187125716, guid: 170fc095e228f8e4e99f14a73ffd03aa, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2886,6 +2890,10 @@ PrefabInstance:
     - target: {fileID: 1900649125097781412, guid: 15524b5d438ba7f46ae208f6b171aa22, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7479327899604488464, guid: 15524b5d438ba7f46ae208f6b171aa22, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3771,6 +3779,7 @@ MonoBehaviour:
   minTorque: 4
   maxTorque: 7
   throwDirectionMaxAngle: 10
+  simulationEndThreshold: 1
   keepObjectsDynamicAfterThrow: 1
   rootObjectsToSearchForDynamicsIn:
   - {fileID: 491014118}
@@ -3995,6 +4004,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: bottle_A_green_dynamic
       objectReference: {fileID: 0}
+    - target: {fileID: 5725907775638263769, guid: 062c0384cac62ef478a2c73af70da598, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4126,6 +4139,10 @@ PrefabInstance:
     - target: {fileID: 1900649125097781412, guid: 15524b5d438ba7f46ae208f6b171aa22, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7479327899604488464, guid: 15524b5d438ba7f46ae208f6b171aa22, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4890,6 +4907,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: chair
       objectReference: {fileID: 0}
+    - target: {fileID: 8010288397368023132, guid: dcb9198420d85684caf065b083cc5f12, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5145,6 +5166,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: bottle_A_green_dynamic (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 5725907775638263769, guid: 062c0384cac62ef478a2c73af70da598, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5329,6 +5354,10 @@ PrefabInstance:
     - target: {fileID: 1900649125097781412, guid: 15524b5d438ba7f46ae208f6b171aa22, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7479327899604488464, guid: 15524b5d438ba7f46ae208f6b171aa22, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5585,6 +5614,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: bottle_A_brown_dynamic
       objectReference: {fileID: 0}
+    - target: {fileID: 7685721625187125716, guid: 170fc095e228f8e4e99f14a73ffd03aa, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5821,6 +5854,10 @@ PrefabInstance:
     - target: {fileID: 1900649125097781412, guid: 15524b5d438ba7f46ae208f6b171aa22, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7479327899604488464, guid: 15524b5d438ba7f46ae208f6b171aa22, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6881,6 +6918,10 @@ PrefabInstance:
     - target: {fileID: 3314442039127911665, guid: 062c0384cac62ef478a2c73af70da598, type: 3}
       propertyPath: m_Name
       value: bottle_A_green_dynamic (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5725907775638263769, guid: 062c0384cac62ef478a2c73af70da598, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
