@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using Wokarol.Common;
 using Wokarol.GameSystemsLocator;
 using Wokarol.Utils;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 using Random = UnityEngine.Random;
 
 namespace Wokarol
@@ -22,15 +23,35 @@ namespace Wokarol
         [Space]
         [SerializeField] private float throwDirectionMaxAngle = 10;
         [Space]
-        [SerializeField] private bool keepRolledDiceDynamic = true;
+        [SerializeField] private SimulationEndThreshold simulationEndThreshold = SimulationEndThreshold.DiceSleeping;
+        [SerializeField] private bool keepObjectsDynamicAfterThrow = true;
+        [SerializeField] private List<GameObject> rootObjectsToSearchForDynamicsIn = new();
+        [Space]
         [Space]
         [SerializeField] private bool extraDebugData = false;
 
-        List<Dice> allDynamicDice = new();
+        List<Rigidbody> sceneDynamicObjects = new();
+
+        List<Rigidbody> allDynamicObjects = new();
         List<Dice> diceRolledThisThrow = new();
 
-        List<Queue<SimulatedPhysicsFrame>> computedAnimation = new();
+        List<SimulatedPhysicsFramesData> computedAnimation = new();
         private bool isRollingDice;
+
+        private void Start()
+        {
+            foreach (var r in rootObjectsToSearchForDynamicsIn)
+            {
+                foreach (var candidate in r.GetComponentsInChildren<Rigidbody>())
+                {
+                    if (candidate.isKinematic) continue;
+
+                    sceneDynamicObjects.Add(candidate);
+                    allDynamicObjects.Add(candidate);
+                    computedAnimation.Add(new());
+                }
+            }
+        }
 
         private void Update()
         {
@@ -69,7 +90,7 @@ namespace Wokarol
 
             isRollingDice = true;
 
-            allDynamicDice.RemoveAll(d => d == null);
+            allDynamicObjects.RemoveAll(d => d == null);
 
             diceRolledThisThrow.Clear();
 
@@ -87,7 +108,7 @@ namespace Wokarol
                 d.Body.AddForce(force * (Quaternion.AngleAxis(angle, Vector3.up) * transform.forward), ForceMode.Impulse);
                 d.Body.AddTorque(torqueForce * torqueAxis, ForceMode.Impulse);
 
-                allDynamicDice.Add(d);
+                allDynamicObjects.Add(d.Body);
                 diceRolledThisThrow.Add(d);
                 computedAnimation.Add(new());
             }
@@ -103,39 +124,59 @@ namespace Wokarol
             {
                 Physics.Simulate(Time.fixedDeltaTime);
 
-                bool areAllDiceDone = true;
+                bool isSimulationReadyToStop = true;
 
-                for (int i = 0; i < allDynamicDice.Count; i++)
+                for (int i = 0; i < allDynamicObjects.Count; i++)
                 {
-                    var d = allDynamicDice[i];
+                    var d = allDynamicObjects[i];
 
-                    if (!d.Body.IsSleeping())
-                        areAllDiceDone = false;
-
-                    computedAnimation[i].Enqueue(new()
+                    if (simulationEndThreshold is SimulationEndThreshold.AllSleeping or SimulationEndThreshold.LowVelocity)
                     {
-                        Position = d.Body.position,
-                        Rotation = d.Body.rotation,
+                        if (simulationEndThreshold is SimulationEndThreshold.AllSleeping && !d.IsSleeping())
+                            isSimulationReadyToStop = false; 
+
+                        if (simulationEndThreshold is SimulationEndThreshold.LowVelocity && (d.linearVelocity.magnitude > 0.2f || d.angularVelocity.magnitude > 0.2f))
+                            isSimulationReadyToStop = false;
+                    }
+
+                    computedAnimation[i].Frames.Enqueue(new()
+                    {
+                        Position = d.position,
+                        Rotation = d.rotation,
                     });
+
+                    computedAnimation[i].LastLinearVelocity = d.linearVelocity;
+                    computedAnimation[i].LastAngularVelocity = d.angularVelocity;
                 }
 
-                if (areAllDiceDone)
+                if (simulationEndThreshold is SimulationEndThreshold.DiceSleeping)
                 {
+                    for (int i = 0; i < diceRolledThisThrow.Count; i++)
+                    {
+                        if (!diceRolledThisThrow[i].Body.IsSleeping())
+                            isSimulationReadyToStop = false;
+                    }
+
+                }
+
+                if (isSimulationReadyToStop)
+                {
+                    Debug.Log($"{LogExtras.Prefix(this)} Smulated the roll in {LogExtras.Value(step)} steps");
                     break;
                 }
                 else if (step == 999)
                 {
-                    Debug.Log($"{LogExtras.Prefix(this)} Reached the simulation step limit");
+                    Debug.LogWarning($"{LogExtras.Prefix(this)} Reached the simulation step limit");
                 }
             }
 
-            var steps = computedAnimation[0].Count;
+            var steps = computedAnimation[0].Frames.Count;
 
             // We prep the dice for the animation
-            for (int i = 0; i < allDynamicDice.Count; i++)
+            for (int i = 0; i < allDynamicObjects.Count; i++)
             {
-                var d = allDynamicDice[i];
-                d.Body.isKinematic = true;
+                var d = allDynamicObjects[i];
+                d.isKinematic = true;
             }
 
             for (int i = 0; i < diceRolledThisThrow.Count; i++)
@@ -145,15 +186,15 @@ namespace Wokarol
             }
 
             // We reset the dice
-            for (int i = 0; i < allDynamicDice.Count; i++)
+            for (int i = 0; i < allDynamicObjects.Count; i++)
             {
-                var frame = computedAnimation[i].Dequeue();
+                var frame = computedAnimation[i].Frames.Dequeue();
 
-                allDynamicDice[i].transform.position = frame.Position;
-                allDynamicDice[i].transform.rotation = frame.Rotation;
+                allDynamicObjects[i].transform.position = frame.Position;
+                allDynamicObjects[i].transform.rotation = frame.Rotation;
 
-                allDynamicDice[i].Body.position = frame.Position;
-                allDynamicDice[i].Body.rotation = frame.Rotation;
+                allDynamicObjects[i].position = frame.Position;
+                allDynamicObjects[i].rotation = frame.Rotation;
             }
 
             // The simulation starts again
@@ -163,26 +204,30 @@ namespace Wokarol
             {
                 await UniTask.WaitForFixedUpdate(ct);
 
-                for (int i = 0; i < allDynamicDice.Count; i++)
+                for (int i = 0; i < allDynamicObjects.Count; i++)
                 {
-                    var frame = computedAnimation[i].Dequeue();
+                    var frame = computedAnimation[i].Frames.Dequeue();
 
-                    allDynamicDice[i].Body.position = frame.Position;
-                    allDynamicDice[i].Body.rotation = frame.Rotation;
+                    allDynamicObjects[i].position = frame.Position;
+                    allDynamicObjects[i].rotation = frame.Rotation;
                 }
             }
 
             // We clean up and revert the things to correct state
-            if (keepRolledDiceDynamic)
+            if (keepObjectsDynamicAfterThrow)
             {
-                foreach (var d in allDynamicDice)
+                for (int i = 0; i < allDynamicObjects.Count; i++)
                 {
-                    d.Body.isKinematic = false;
+                    var d = allDynamicObjects[i];
+                    d.isKinematic = false;
+                    allDynamicObjects[i].linearVelocity = computedAnimation[i].LastLinearVelocity;
+                    allDynamicObjects[i].angularVelocity = computedAnimation[i].LastAngularVelocity;
                 }
             }
             else
             {
-                allDynamicDice.Clear();
+                allDynamicObjects.Clear();
+                computedAnimation.Clear();
             }
 
             isRollingDice = false;
@@ -197,14 +242,14 @@ namespace Wokarol
             int framesMax = 0;
 
 
-            if (allDynamicDice.Count > 0)
+            if (allDynamicObjects.Count > 0)
             {
-                Span<int> framesPerDice = stackalloc int[allDynamicDice.Count];
-                dices = allDynamicDice.Count;
+                Span<int> framesPerDice = stackalloc int[allDynamicObjects.Count];
+                dices = allDynamicObjects.Count;
 
-                for (int i = 0; i < allDynamicDice.Count; i++)
+                for (int i = 0; i < allDynamicObjects.Count; i++)
                 {
-                    framesPerDice[i] = computedAnimation[i]?.Count ?? 0;
+                    framesPerDice[i] = computedAnimation[i]?.Frames?.Count ?? 0;
                 }
 
                 framesMin = 9999999;
@@ -227,6 +272,21 @@ namespace Wokarol
         {
             public Vector3 Position;
             public Quaternion Rotation;
+        }
+
+        class SimulatedPhysicsFramesData
+        {
+            public Queue<SimulatedPhysicsFrame> Frames = new();
+
+            public Vector3 LastLinearVelocity;
+            public Vector3 LastAngularVelocity;
+        }
+
+        enum SimulationEndThreshold
+        {
+            AllSleeping,
+            DiceSleeping,
+            LowVelocity,
         }
     }
 }
