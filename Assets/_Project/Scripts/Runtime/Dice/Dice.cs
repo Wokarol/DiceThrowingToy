@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Linq;
 using Wokarol.Utils;
 using Random = UnityEngine.Random;
+using PrimeTween;
+
 
 
 
@@ -33,7 +35,7 @@ namespace Wokarol
 
         public abstract (Vector3 normal, Vector3 forward) GetLocalFaceCoordinates(int faceIndex);
 
-        public void ForceValue(int targetValue)
+        public void ForceValue(int targetValue, bool withAnimation = false)
         {
             var actualFaceIndex = GetIndexOfTopFace(considerModelRotation: false);
             var targetFaceIndex = Array.IndexOf(values, targetValue);
@@ -56,7 +58,17 @@ namespace Wokarol
                 Quaternion.AngleAxis(Random.Range(0, FaceEdgeCount) * (360f / FaceEdgeCount), Vector3.up) * 
                 Quaternion.Inverse(targetfaceRotation);
 
-            model.localRotation = correctionRotation;
+            if (withAnimation)
+            {
+                if (model.localRotation != correctionRotation)
+                {
+                    Tween.LocalRotation(model, correctionRotation, 0.1f);
+                }
+            }
+            else
+            {
+                model.localRotation = correctionRotation;
+            }
         }
 
         public int CheckValue()

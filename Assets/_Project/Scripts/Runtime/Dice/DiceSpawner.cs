@@ -6,8 +6,8 @@ using UnityEngine.InputSystem;
 using Wokarol.Common;
 using Wokarol.GameSystemsLocator;
 using Wokarol.Utils;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 using Random = UnityEngine.Random;
+using Linq = System.Linq;
 
 namespace Wokarol
 {
@@ -28,6 +28,7 @@ namespace Wokarol
         [SerializeField] private List<GameObject> rootObjectsToSearchForDynamicsIn = new();
         [Space]
         [Space]
+        [SerializeField] private bool enableAnimation = false;
         [SerializeField] private bool extraDebugData = false;
 
         List<Rigidbody> sceneDynamicObjects = new();
@@ -125,6 +126,11 @@ namespace Wokarol
             {
                 Physics.Simulate(Time.fixedDeltaTime);
 
+                if (enableAnimation)
+                {
+                    await UniTask.Delay(TimeSpan.FromSeconds(Time.fixedDeltaTime), cancellationToken: ct);
+                }
+
                 bool isSimulationReadyToStop = true;
 
                 for (int i = 0; i < allDynamicObjects.Count; i++)
@@ -181,10 +187,40 @@ namespace Wokarol
                 d.isKinematic = true;
             }
 
+            if (enableAnimation)
+            {
+                await UniTask.Delay(200, cancellationToken: ct);
+            }
+
             for (int i = 0; i < diceRolledThisThrow.Count; i++)
             {
                 var d = diceRolledThisThrow[i];
-                d.ForceValue(values[i]);
+                d.ForceValue(values[i], withAnimation: enableAnimation);
+            }
+
+            if (enableAnimation)
+            {
+                await UniTask.Delay(150, cancellationToken: ct);
+
+                Physics.simulationMode = SimulationMode.FixedUpdate;
+                Time.fixedDeltaTime /= 2;
+
+                var framesAsArrays = Linq.Enumerable.ToArray(Linq.Enumerable.Select(computedAnimation, c => c.Frames.ToArray()));
+
+                for (int step = steps - 1; step >= 0; step--) // The first step is handled by reseting
+                {
+                    await UniTask.WaitForFixedUpdate(ct);
+
+                    for (int i = 0; i < allDynamicObjects.Count; i++)
+                    {
+                        var frame = framesAsArrays[i][step];
+
+                        allDynamicObjects[i].position = frame.Position;
+                        allDynamicObjects[i].rotation = frame.Rotation;
+                    }
+                }
+
+                Time.fixedDeltaTime *= 2;
             }
 
             // We reset the dice

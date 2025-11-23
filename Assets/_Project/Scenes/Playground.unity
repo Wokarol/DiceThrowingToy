@@ -3783,6 +3783,7 @@ MonoBehaviour:
   keepObjectsDynamicAfterThrow: 1
   rootObjectsToSearchForDynamicsIn:
   - {fileID: 491014118}
+  enableAnimation: 0
   extraDebugData: 0
 --- !u!1 &1120395192
 GameObject:
