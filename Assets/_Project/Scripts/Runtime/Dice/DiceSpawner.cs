@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 using Wokarol.Common;
 using Wokarol.GameSystemsLocator;
 using Wokarol.Utils;
-using Random = UnityEngine.Random;
 using Linq = System.Linq;
+using Random = UnityEngine.Random;
 
 namespace Wokarol
 {
@@ -24,6 +25,8 @@ namespace Wokarol
         [SerializeField] private float throwDirectionMaxAngle = 10;
         [Space]
         [SerializeField] private SimulationEndThreshold simulationEndThreshold = SimulationEndThreshold.DiceSleeping;
+        [SerializeField] private float lowLinearVelocityMagnitude = 0.2f;
+        [SerializeField] private float lowAngularVelocityMagnitude = 0.2f;
         [SerializeField] private bool keepDiceDynamicAfterThrow = true;
         [SerializeField] private List<GameObject> rootObjectsToSearchForDynamicsIn = new();
         [Space]
@@ -121,6 +124,8 @@ namespace Wokarol
 
             Physics.Simulate(Time.fixedDeltaTime);
 
+            var timeStart = System.Diagnostics.Stopwatch.GetTimestamp();
+
             int maxSteps = (int)(20f / Time.fixedDeltaTime);
             for (int step = 0; step <= maxSteps; step++)
             {
@@ -137,12 +142,12 @@ namespace Wokarol
                 {
                     var d = allDynamicObjects[i];
 
-                    if (simulationEndThreshold is SimulationEndThreshold.AllSleeping or SimulationEndThreshold.LowVelocity)
+                    if (simulationEndThreshold is SimulationEndThreshold.AllSleeping or SimulationEndThreshold.AllLowVelocity)
                     {
                         if (simulationEndThreshold is SimulationEndThreshold.AllSleeping && !d.IsSleeping())
                             isSimulationReadyToStop = false; 
 
-                        if (simulationEndThreshold is SimulationEndThreshold.LowVelocity && (d.linearVelocity.magnitude > 0.2f || d.angularVelocity.magnitude > 0.2f))
+                        if (simulationEndThreshold is SimulationEndThreshold.AllLowVelocity && (d.linearVelocity.magnitude > lowLinearVelocityMagnitude || d.angularVelocity.magnitude > lowAngularVelocityMagnitude))
                             isSimulationReadyToStop = false;
                     }
 
@@ -157,19 +162,30 @@ namespace Wokarol
                     computedAnimation[i].WasSleepingAtTheEnd = d.IsSleeping();
                 }
 
-                if (simulationEndThreshold is SimulationEndThreshold.DiceSleeping)
+                if (simulationEndThreshold is SimulationEndThreshold.DiceSleeping or SimulationEndThreshold.DiceLowVelocity)
                 {
-                    for (int i = 0; i < diceRolledThisThrow.Count; i++)
+                    if (simulationEndThreshold is SimulationEndThreshold.DiceLowVelocity)
                     {
-                        if (!diceRolledThisThrow[i].Body.IsSleeping())
-                            isSimulationReadyToStop = false;
+                        for (int i = 0; i < diceRolledThisThrow.Count; i++)
+                        {
+                            if (diceRolledThisThrow[i].Body.linearVelocity.magnitude > lowLinearVelocityMagnitude || diceRolledThisThrow[i].Body.angularVelocity.magnitude > lowAngularVelocityMagnitude)
+                                isSimulationReadyToStop = false;
+                        }
+                    }
+
+                    if (simulationEndThreshold is SimulationEndThreshold.DiceSleeping)
+                    {
+                        for (int i = 0; i < diceRolledThisThrow.Count; i++)
+                        {
+                            if (!diceRolledThisThrow[i].Body.IsSleeping())
+                                isSimulationReadyToStop = false;
+                        }
                     }
 
                 }
 
                 if (isSimulationReadyToStop)
                 {
-                    Debug.Log($"{LogExtras.Prefix(this)} Simulated the roll in {LogExtras.Value(step)} steps");
                     break;
                 }
                 else if (step == maxSteps)
@@ -178,7 +194,12 @@ namespace Wokarol
                 }
             }
 
+            var timeEnd = System.Diagnostics.Stopwatch.GetTimestamp();
+
+
             var steps = computedAnimation[0].Frames.Count;
+
+            Debug.Log($"{LogExtras.Prefix(this)} Simulated the roll in {LogExtras.Value(steps)} steps and {LogExtras.Value(TimeSpan.FromTicks(timeEnd - timeStart).TotalMilliseconds)} ms");
 
             // We prep the dice for the animation
             for (int i = 0; i < allDynamicObjects.Count; i++)
@@ -336,7 +357,8 @@ namespace Wokarol
         {
             AllSleeping,
             DiceSleeping,
-            LowVelocity,
+            AllLowVelocity,
+            DiceLowVelocity,
         }
     }
 }

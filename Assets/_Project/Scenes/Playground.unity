@@ -3780,7 +3780,9 @@ MonoBehaviour:
   maxTorque: 7
   throwDirectionMaxAngle: 10
   simulationEndThreshold: 1
-  keepObjectsDynamicAfterThrow: 1
+  lowLinearVelocityMagnitude: 0.5
+  lowAngularVelocityMagnitude: 20
+  keepDiceDynamicAfterThrow: 1
   rootObjectsToSearchForDynamicsIn:
   - {fileID: 491014118}
   enableAnimation: 0
